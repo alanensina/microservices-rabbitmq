@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  ms-email-db:
+    image: postgres:latest
+    container_name: ms-email-db
+    environment:
+      POSTGRES_DB: ms-email
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    networks:
+      - ms-network-email
+
+  ms-user-db:
+    image: postgres:latest
+    container_name: ms-user-db
+    environment:
+      POSTGRES_DB: ms-user
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    networks:
+      - ms-network-user
+
+networks:
+  ms-network-user:
+  ms-network-email:
