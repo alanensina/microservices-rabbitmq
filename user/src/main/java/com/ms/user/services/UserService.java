@@ -3,6 +3,7 @@ package com.ms.user.services;
 import com.ms.user.dtos.UserRecordSaveDTO;
 import com.ms.user.dtos.UserRecordUpdateDTO;
 import com.ms.user.models.User;
+import com.ms.user.producers.UserProducer;
 import com.ms.user.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
@@ -17,17 +18,20 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository repository;
+    private final UserProducer producer;
 
-    public UserService(UserRepository repository) {
+    public UserService(UserRepository repository, UserProducer producer) {
         this.repository = repository;
+        this.producer = producer;
     }
 
     @Transactional
     public ResponseEntity<User> save(UserRecordSaveDTO dto) {
-            var user = new User();
-            BeanUtils.copyProperties(dto, user);
-            user = repository.save(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(user);
+        var user = new User();
+        BeanUtils.copyProperties(dto, user);
+        user = repository.save(user);
+        producer.publishEmailMessage(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
     public ResponseEntity<User> findById(UUID id) {
